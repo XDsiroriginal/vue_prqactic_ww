@@ -1,0 +1,43 @@
+:root {
+    --color: #9B2D30;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.create_new_task_box {
+    width: 85vw;
+    padding: 20px;
+    box-shadow: 0 5px 10px 2px rgba(34, 60, 80, 0.2);
+    border-radius: 20px;
+    margin: 20px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.create_new_task_button {
+    width: 350px;
+    height: 50px;
+    background-color: var(--color);
+    border-radius: 20px;
+    color: white;
+    font-size: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.work_box {
+    width: 85vw;
+    padding: 20px;
+    box-shadow: 0 5px 10px 2px rgba(34, 60, 80, 0.2);
+    border-radius: 20px;
+    margin: 20px auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
