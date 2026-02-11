@@ -4,7 +4,14 @@ Vue.component('fourth_columns', {
         <div class="columns">
             <h3>{{ column.completedTasks.name }}</h3>
             <div class="task" v-for="task in column.completedTasks.task" :key="task">
-                {{ task }}
+                <p>Имя: {{ task.title }}</p>
+                <div>
+                    <p>Описание: </p>
+                    <textarea readonly>{{ task.description }}</textarea>
+                </div>
+                <p v-for="p in task.tasks">Задача: {{ p }}</p>
+                <p style="color: #9B2D30"> дедлайн {{ task.deadline }}</p>
+                <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
             </div>
         </div>
     `
@@ -16,7 +23,14 @@ Vue.component('third_columns', {
         <div class="columns">
             <h3>{{ column.testing.name }}</h3>
             <div class="task" v-for="task in column.testing.task" :key="task">
-                {{ task }}
+                <p>Имя: {{ task.title }}</p>
+                <div>
+                    <p>Описание: </p>
+                    <textarea readonly>{{ task.description }}</textarea>
+                </div>
+                <p v-for="p in task.tasks">Задача: {{ p }}</p>
+                <p style="color: #9B2D30"> дедлайн {{ task.deadline }}</p>
+                <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
             </div>
         </div>
     `
@@ -28,7 +42,14 @@ Vue.component('second_columns', {
         <div class="columns">
             <h3>{{ column.tasksInProgress.name }}</h3>
             <div class="task" v-for="task in column.tasksInProgress.task" :key="task">
-                {{ task }}
+                <p>Имя: {{ task.title }}</p>
+                <div>
+                    <p>Описание: </p>
+                    <textarea readonly>{{ task.description }}</textarea>
+                </div>
+                <p v-for="p in task.tasks">Задача: {{ p }}</p>
+                <p style="color: #9B2D30"> дедлайн {{ task.deadline }}</p>
+                <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
             </div>
         </div>
     `
@@ -40,17 +61,86 @@ Vue.component('first_columns', {
         <div class="columns">
             <h3>{{ column.scheduledTasks.name }}</h3>
             <div class="task" v-for="task in column.scheduledTasks.task" :key="task">
-                <p>Имя: {{ task.title }}</p>
-                <div>
-                    <p>Описание: </p>
-                    <textarea> {{ task.description }} </textarea>
+                
+                <div v-show="!task.cardRedacted" class="none-redacted">
+                
+                    <div @click="redactedTasks(task)" class="redacted_button">
+                        <p>Изменить карточку</p>
+                    </div>
+                    
+                    <p>Имя: {{ task.title }}</p>
+                    <div>
+                        <p>Описание: </p>
+                        <textarea readonly>{{ task.description }}</textarea>
+                    </div>
+                    <p v-for="p in task.tasks">Задача: {{ p }}</p>
+                    <p style="color: #9B2D30"> дедлайн {{ task.deadline }}</p>
+                    <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
                 </div>
-                <p v-for="p in task.tasks">Задача: {{ p }}</p>
-                <p style="color: #9B2D30"> {{ task.deadline }} </p>
-                <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }} </p>
+                
+                <div v-show="task.cardRedacted" class="redacted-mode">
+                
+                    <div @click="saveRedactedTasks(task)" class="saveRedacted_button">
+                        <p>Сохранить карточку</p>
+                    </div>
+                
+                    <div style="display: inline">
+                        <p>Имя: </p>
+                        <input class="edit_input" v-model="task.editedTitle" :placeholder="task.title" type="text">
+                    </div>
+                    <div>
+                        <p>Описание: </p>
+                        <input class="edit_input" v-model="task.editedDescription" :placeholder="task.description" type="text">
+                    </div>
+                    <div v-for="(p, index) in task.tasks" :key="index" style="display: inline">
+                        <p>Задача {{ index + 1 }}: 
+                            <input class="edit_input" v-model="task.editedTasks[index]" :placeholder="p" type="text">
+                        </p>
+                    </div>
+                    <div style="display: inline">
+                        <p style="color: #9B2D30"> дедлайн</p>
+                        <input class="edit_input" v-model="task.editedDeadline" type="datetime-local">
+                    </div>
+                    <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
+                </div>
             </div>
         </div>
-    `
+    `,
+    methods: {
+        redactedTasks(task) {
+            task.editedTitle = task.title;
+            task.editedDescription = task.description;
+            task.editedTasks = [...task.tasks];
+            task.editedDeadline = task.deadline !== 'не задан' ? task.deadline : '';
+            task.cardRedacted = true;
+        },
+
+        saveRedactedTasks(task) {
+            task.title = task.editedTitle;
+            task.description = task.editedDescription;
+
+            if (task.editedTasks) {
+                task.editedTasks.forEach((editedTask, i) => {
+                    if (editedTask && editedTask.trim() !== '') {
+                        task.tasks[i] = editedTask;
+                    }
+                });
+            }
+
+            if (task.editedDeadline) {
+                task.deadline = task.editedDeadline;
+            }
+
+            task.dateCreated = new Date();
+
+            task.editedTitle = '';
+            task.editedDescription = '';
+            task.editedTasks = [];
+            task.editedDeadline = '';
+
+            task.cardRedacted = false;
+        }
+    }
 })
 
 Vue.component('create_new_task_component', {
@@ -65,7 +155,7 @@ Vue.component('create_new_task_component', {
                     <input type="text" placeholder="вторая задача" v-model="tasks.task2" class="input">
                     <input type="text" placeholder="третья задача" v-model="tasks.task3" class="input">  
                     
-                    <input type="datetime-local" placeholder="третья задача" v-model="tasks.deadline" class="input">                  
+                    <input type="datetime-local" placeholder="дедлайн" v-model="deadline" class="input">                  
                     
                 </div>
                 
@@ -84,6 +174,7 @@ Vue.component('create_new_task_component', {
                 task2: '',
                 task3: '',
             },
+            deadline: ''
         }
     },
     methods: {
@@ -91,13 +182,18 @@ Vue.component('create_new_task_component', {
             let task = {
                 dateCreated: new Date(),
                 title: this.title || 'Без имени',
-                description: this.description || 'Без имени',
+                description: this.description || 'Без описания',
                 tasks: [
                     this.tasks.task1 || 'Без имени',
                     this.tasks.task2 || 'Без имени',
                     this.tasks.task3 || 'Без имени'
                 ].filter(task => task !== ''),
                 deadline: this.deadline || 'не задан',
+                cardRedacted: false,
+                editedTitle: '',
+                editedDescription: '',
+                editedTasks: [],
+                editedDeadline: ''
             }
 
             this.$root.columns.scheduledTasks.task.push(task);
@@ -107,8 +203,8 @@ Vue.component('create_new_task_component', {
             this.tasks.task1 = '';
             this.tasks.task2 = '';
             this.tasks.task3 = '';
+            this.deadline = '';
 
-            console.log('Новая задача создана:', task);
         }
     }
 })
