@@ -41,7 +41,7 @@ Vue.component('second_columns', {
     template: `
         <div class="columns">
             <h3>{{ column.tasksInProgress.name }}</h3>
-            <div class="task" v-for="task in column.tasksInProgress.task">
+            <div class="task" v-for="(task, index) in column.tasksInProgress.task">
                 <div v-show="!task.cardRedacted" class="none-redacted">
                 
                     <div class="top_button">
@@ -49,7 +49,7 @@ Vue.component('second_columns', {
                             <p>Изменить карточку</p>
                         </div>
                         
-                        <div @click="goToSecond(index)" class="next">
+                        <div @click="goToThird(index)" class="next">
                             <p>→</p>
                         </div>
                     </div>
@@ -91,7 +91,15 @@ Vue.component('second_columns', {
                 </div>
             </div>
         </div>
-    `
+    `,
+    methods: {
+        goToThird(index) {
+            let task = this.column.tasksInProgress.task[index];
+            this.column.tasksInProgress.task.splice(index, 1);
+            this.$root.columns.testing.task.push(task);
+            console.log(this.columns.testing);
+        }
+    }
 })
 
 Vue.component('first_columns', {
@@ -154,7 +162,7 @@ Vue.component('first_columns', {
     methods: {
 
         goToSecond(index) {
-            const task = this.column.scheduledTasks.task[index];
+            let task = this.column.scheduledTasks.task[index];
             this.column.scheduledTasks.task.splice(index, 1);
             this.$root.columns.tasksInProgress.task.push(task);
         }
