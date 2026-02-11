@@ -3,7 +3,7 @@ Vue.component('fourth_columns', {
     template: `
         <div class="columns">
             <h3>{{ column.completedTasks.name }}</h3>
-            <div class="task" v-for="task in column.completedTasks.task" :key="task">
+            <div class="task" v-for="task in column.completedTasks.task">
                 <p>Имя: {{ task.title }}</p>
                 <div>
                     <p>Описание: </p>
@@ -22,7 +22,7 @@ Vue.component('third_columns', {
     template: `
         <div class="columns">
             <h3>{{ column.testing.name }}</h3>
-            <div class="task" v-for="task in column.testing.task" :key="task">
+            <div class="task" v-for="task in column.testing.task">
                 <p>Имя: {{ task.title }}</p>
                 <div>
                     <p>Описание: </p>
@@ -37,35 +37,21 @@ Vue.component('third_columns', {
 })
 
 Vue.component('second_columns', {
-    props: ['column'],
+    props: ['column', 'redactedTasks', 'saveRedactedTasks'],
     template: `
         <div class="columns">
             <h3>{{ column.tasksInProgress.name }}</h3>
-            <div class="task" v-for="task in column.tasksInProgress.task" :key="task">
-                <p>Имя: {{ task.title }}</p>
-                <div>
-                    <p>Описание: </p>
-                    <textarea readonly>{{ task.description }}</textarea>
-                </div>
-                <p v-for="p in task.tasks">Задача: {{ p }}</p>
-                <p style="color: #9B2D30"> дедлайн {{ task.deadline }}</p>
-                <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
-            </div>
-        </div>
-    `
-})
-
-Vue.component('first_columns', {
-    props: ['column'],
-    template: `
-        <div class="columns">
-            <h3>{{ column.scheduledTasks.name }}</h3>
-            <div class="task" v-for="task in column.scheduledTasks.task" :key="task">
-                
+            <div class="task" v-for="task in column.tasksInProgress.task">
                 <div v-show="!task.cardRedacted" class="none-redacted">
                 
-                    <div @click="redactedTasks(task)" class="redacted_button">
-                        <p>Изменить карточку</p>
+                    <div class="top_button">
+                        <div @click="redactedTasks(task)" class="redacted_button">
+                            <p>Изменить карточку</p>
+                        </div>
+                        
+                        <div @click="goToSecond(index)" class="next">
+                            <p>→</p>
+                        </div>
                     </div>
                     
                     <p>Имя: {{ task.title }}</p>
@@ -92,7 +78,66 @@ Vue.component('first_columns', {
                         <p>Описание: </p>
                         <input class="edit_input" v-model="task.editedDescription" :placeholder="task.description" type="text">
                     </div>
-                    <div v-for="(p, index) in task.tasks" :key="index" style="display: inline">
+                    <div v-for="(p, index) in task.tasks" style="display: inline">
+                        <p>Задача {{ index + 1 }}: 
+                            <input class="edit_input" v-model="task.editedTasks[index]" :placeholder="p" type="text">
+                        </p>
+                    </div>
+                    <div style="display: inline">
+                        <p style="color: #9B2D30"> дедлайн</p>
+                        <input class="edit_input" v-model="task.editedDeadline" type="datetime-local">
+                    </div>
+                    <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
+                </div>
+            </div>
+        </div>
+    `
+})
+
+Vue.component('first_columns', {
+    props: ['column', 'redactedTasks', 'saveRedactedTasks'],
+    template: `
+        <div class="columns">
+            <h3>{{ column.scheduledTasks.name }}</h3>
+            <div class="task" v-for="(task, index) in column.scheduledTasks.task" :key="index">
+                
+                <div v-show="!task.cardRedacted" class="none-redacted">
+                
+                    <div class="top_button">
+                        <div @click="redactedTasks(task)" class="redacted_button">
+                            <p>Изменить карточку</p>
+                        </div>
+                        
+                        <div @click="goToSecond(index)" class="next">
+                            <p>→</p>
+                        </div>
+                    </div>
+                    
+                    <p>Имя: {{ task.title }}</p>
+                    <div>
+                        <p>Описание: </p>
+                        <textarea readonly>{{ task.description }}</textarea>
+                    </div>
+                    <p v-for="p in task.tasks">Задача: {{ p }}</p>
+                    <p style="color: #9B2D30"> дедлайн {{ task.deadline }}</p>
+                    <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
+                </div>
+                
+                <div v-show="task.cardRedacted" class="redacted-mode">
+                
+                    <div @click="saveRedactedTasks(task)" class="saveRedacted_button">
+                        <p>Сохранить карточку</p>
+                    </div>
+                
+                    <div style="display: inline">
+                        <p>Имя: </p>
+                        <input class="edit_input" v-model="task.editedTitle" :placeholder="task.title" type="text">
+                    </div>
+                    <div>
+                        <p>Описание: </p>
+                        <input class="edit_input" v-model="task.editedDescription" :placeholder="task.description" type="text">
+                    </div>
+                    <div v-for="(p, index) in task.tasks" style="display: inline">
                         <p>Задача {{ index + 1 }}: 
                             <input class="edit_input" v-model="task.editedTasks[index]" :placeholder="p" type="text">
                         </p>
@@ -107,38 +152,11 @@ Vue.component('first_columns', {
         </div>
     `,
     methods: {
-        redactedTasks(task) {
-            task.editedTitle = task.title;
-            task.editedDescription = task.description;
-            task.editedTasks = [...task.tasks];
-            task.editedDeadline = task.deadline !== 'не задан' ? task.deadline : '';
-            task.cardRedacted = true;
-        },
 
-        saveRedactedTasks(task) {
-            task.title = task.editedTitle;
-            task.description = task.editedDescription;
-
-            if (task.editedTasks) {
-                task.editedTasks.forEach((editedTask, i) => {
-                    if (editedTask && editedTask.trim() !== '') {
-                        task.tasks[i] = editedTask;
-                    }
-                });
-            }
-
-            if (task.editedDeadline) {
-                task.deadline = task.editedDeadline;
-            }
-
-            task.dateCreated = new Date();
-
-            task.editedTitle = '';
-            task.editedDescription = '';
-            task.editedTasks = [];
-            task.editedDeadline = '';
-
-            task.cardRedacted = false;
+        goToSecond(index) {
+            const task = this.column.scheduledTasks.task[index];
+            this.column.scheduledTasks.task.splice(index, 1);
+            this.$root.columns.tasksInProgress.task.push(task);
         }
     }
 })
@@ -229,6 +247,41 @@ let app = new Vue({
                 name: 'Выполненные задачи',
                 task: [],
             }
+        },
+    },
+    methods: {
+        redactedTasks(task) {
+            task.editedTitle = task.title;
+            task.editedDescription = task.description;
+            task.editedTasks = [...task.tasks];
+            task.editedDeadline = task.deadline !== 'не задан' ? task.deadline : '';
+            task.cardRedacted = true;
+        },
+
+        saveRedactedTasks(task) {
+            task.title = task.editedTitle;
+            task.description = task.editedDescription;
+
+            if (task.editedTasks) {
+                task.editedTasks.forEach((editedTask, i) => {
+                    if (editedTask && editedTask.trim() !== '') {
+                        task.tasks[i] = editedTask;
+                    }
+                });
+            }
+
+            if (task.editedDeadline) {
+                task.deadline = task.editedDeadline;
+            }
+
+            task.dateCreated = new Date();
+
+            task.editedTitle = '';
+            task.editedDescription = '';
+            task.editedTasks = [];
+            task.editedDeadline = '';
+
+            task.cardRedacted = false;
         },
     }
 })

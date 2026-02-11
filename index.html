@@ -13,8 +13,18 @@
   <create_new_task_component></create_new_task_component>
 
   <div class="work_box">
-    <first_columns :column="columns"></first_columns>
-    <second_columns :column="columns"></second_columns>
+    <first_columns
+            :column="columns"
+            :redacted-tasks="redactedTasks"
+            :save-redacted-tasks="saveRedactedTasks">
+    </first_columns>
+
+    <second_columns
+            :column="columns"
+            :redacted-tasks="redactedTasks"
+            :save-redacted-tasks="saveRedactedTasks">
+    </second_columns>
+
     <third_columns :column="columns"></third_columns>
     <fourth_columns :column="columns"></fourth_columns>
   </div>
