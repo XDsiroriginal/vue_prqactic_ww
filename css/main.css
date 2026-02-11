@@ -17,6 +17,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .create_new_task_button {
@@ -40,4 +42,48 @@
     margin: 20px auto;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+}
+
+.columns {
+    display: flex;
+    flex-direction: column;
+    width: 20vw;
+    padding: 20px;
+    box-shadow: 0 5px 10px 2px rgba(34, 60, 80, 0.2);
+    border-radius: 20px;
+    align-items: center;
+    gap: 20px;
+}
+
+.task {
+    width: 90%;
+    padding: 20px;
+    box-shadow: 0 5px 10px 2px rgba(34, 60, 80, 0.2);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.create_new_task_input-block {
+    width: 80%;
+    padding: 20px;
+    box-shadow: 0 5px 10px 2px rgba(34, 60, 80, 0.2);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+
+.input {
+    width: 90%;
+    padding: 15px;
+    box-shadow: 0 5px 10px 2px rgba(34, 60, 80, 0.2);
+    border-radius: 20px;
+}
+
+textarea {
+    resize: vertical;
 }

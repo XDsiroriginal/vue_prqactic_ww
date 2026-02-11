@@ -10,7 +10,14 @@
 </head>
 <body>
 <div id="app">
-  <board></board>
+  <create_new_task_component></create_new_task_component>
+
+  <div class="work_box">
+    <first_columns :column="columns"></first_columns>
+    <second_columns :column="columns"></second_columns>
+    <third_columns :column="columns"></third_columns>
+    <fourth_columns :column="columns"></fourth_columns>
+  </div>
 </div>
 </body>
 </html>
