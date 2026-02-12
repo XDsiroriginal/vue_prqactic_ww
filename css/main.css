@@ -197,3 +197,13 @@ textarea {
     font-weight: bold;
     font-size: 23px;
 }
+
+.task_complete {
+    width: 90%;
+    padding: 20px;
+    box-shadow: 0 5px 10px 2px rgba(12, 200, 10, 0.2);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}

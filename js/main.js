@@ -3,7 +3,7 @@ Vue.component('fourth_columns', {
     template: `
         <div class="columns">
             <h3>{{ column.completedTasks.name }}</h3>
-            <div class="task" v-for="(task, index) in column.completedTasks.task">  
+            <div class="task_complete" v-for="(task, index) in column.completedTasks.task">  
             
                 <p v-if="task.inDeadline" style="color: darkgreen" class="in_dead_line_p">Работа выполнена в срок</p>
                 <p v-else style="color: darkred" class="in_dead_line_p">Работа просрочена</p>
