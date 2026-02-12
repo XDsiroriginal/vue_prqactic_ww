@@ -25,7 +25,11 @@
             :save-redacted-tasks="saveRedactedTasks">
     </second_columns>
 
-    <third_columns :column="columns"></third_columns>
+    <third_columns :column="columns"
+                   :redacted-tasks="redactedTasks"
+                   :save-redacted-tasks="saveRedactedTasks">
+
+    </third_columns>
     <fourth_columns :column="columns"></fourth_columns>
   </div>
 </div>

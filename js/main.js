@@ -18,22 +18,79 @@ Vue.component('fourth_columns', {
 })
 
 Vue.component('third_columns', {
-    props: ['column'],
+    props: ['column', 'redactedTasks', 'saveRedactedTasks'],
     template: `
         <div class="columns">
             <h3>{{ column.testing.name }}</h3>
-            <div class="task" v-for="task in column.testing.task">
-                <p>Имя: {{ task.title }}</p>
-                <div>
-                    <p>Описание: </p>
-                    <textarea readonly>{{ task.description }}</textarea>
+            
+            <div v-show="!task.toBackMenu">
+            
+                <div class="task" v-for="(task, index) in column.testing.task">
+                    <div v-show="!task.cardRedacted" class="none-redacted">
+                    
+                    
+                        <div class="top_button">
+                        
+                            <div @click="goToBack(index)" class="back">
+                                <p>←</p>
+                            </div>
+                        
+                            <div @click="redactedTasks(task)" class="redacted_button">
+                                <p>Изменить карточку</p>
+                            </div>
+                            
+                            <div @click="goToFourth(index)" class="next">
+                                <p>→</p>
+                            </div>
+                        </div>
+                        
+                        <p>Имя: {{ task.title }}</p>
+                        <div>
+                            <p>Описание: </p>
+                            <textarea readonly>{{ task.description }}</textarea>
+                        </div>
+                        <p v-for="p in task.tasks">Задача: {{ p }}</p>
+                        <p style="color: #9B2D30"> дедлайн {{ task.deadline }}</p>
+                        <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
+                    </div>
+                    
+                    <div v-show="task.cardRedacted" class="redacted-mode">
+                    
+                        <div @click="saveRedactedTasks(task)" class="saveRedacted_button">
+                            <p>Сохранить карточку</p>
+                        </div>
+                    
+                        <div style="display: inline">
+                            <p>Имя: </p>
+                            <input class="edit_input" v-model="task.editedTitle" :placeholder="task.title" type="text">
+                        </div>
+                        <div>
+                            <p>Описание: </p>
+                            <input class="edit_input" v-model="task.editedDescription" :placeholder="task.description" type="text">
+                        </div>
+                        <div v-for="(p, index) in task.tasks" style="display: inline">
+                            <p>Задача {{ index + 1 }}: 
+                                <input class="edit_input" v-model="task.editedTasks[index]" :placeholder="p" type="text">
+                            </p>
+                        </div>
+                        <div style="display: inline">
+                            <p style="color: #9B2D30"> дедлайн</p>
+                            <input class="edit_input" v-model="task.editedDeadline" type="datetime-local">
+                        </div>
+                        <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
+                    </div>
                 </div>
-                <p v-for="p in task.tasks">Задача: {{ p }}</p>
-                <p style="color: #9B2D30"> дедлайн {{ task.deadline }}</p>
-                <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
+            
             </div>
         </div>
-    `
+    `,
+    methods: {
+        goToFourth(index) {
+            let task = this.column.testing.task[index];
+            this.column.testing.task.splice(index, 1);
+            this.$root.columns.completedTasks.task.push(task);
+        }
+    }
 })
 
 Vue.component('second_columns', {
@@ -97,7 +154,6 @@ Vue.component('second_columns', {
             let task = this.column.tasksInProgress.task[index];
             this.column.tasksInProgress.task.splice(index, 1);
             this.$root.columns.testing.task.push(task);
-            console.log(this.columns.testing);
         }
     }
 })
@@ -219,7 +275,8 @@ Vue.component('create_new_task_component', {
                 editedTitle: '',
                 editedDescription: '',
                 editedTasks: [],
-                editedDeadline: ''
+                editedDeadline: '',
+                toBackMenu : false,
             }
 
             this.$root.columns.scheduledTasks.task.push(task);
