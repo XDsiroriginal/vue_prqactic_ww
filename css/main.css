@@ -222,3 +222,17 @@ textarea {
     cursor: pointer;
     border: none;
 }
+
+.task_p_non-active {
+    padding: 5px;
+    background: lightpink;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.task_p_active {
+    padding: 5px;
+    background: lightgreen;
+    border-radius: 10px;
+    cursor: pointer;
+}

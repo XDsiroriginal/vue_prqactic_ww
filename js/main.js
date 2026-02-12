@@ -13,7 +13,7 @@ Vue.component('fourth_columns', {
                     <p>Описание: </p>
                     <textarea readonly>{{ task.description }}</textarea>
                 </div>
-                <p v-for="p in task.tasks">Задача: {{ p }}</p>
+                <p class="task_p_non-active" :class="{ 'task_p_active': p.isCompleted }" v-for="p in task.tasks" @click="setStateTask(p)">Задача: {{ p.name }}</p>
                 <p style="color: #9B2D30"> дедлайн {{ task.deadline }}</p>
                 <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
             </div>
@@ -22,7 +22,7 @@ Vue.component('fourth_columns', {
 })
 
 Vue.component('third_columns', {
-    props: ['column', 'redactedTasks', 'saveRedactedTasks'],
+    props: ['column', 'redactedTasks', 'saveRedactedTasks', 'setStateTask'],
     template: `
         <div class="columns">
             <h3>{{ column.testing.name }}</h3>
@@ -54,7 +54,7 @@ Vue.component('third_columns', {
                             <p>Описание: </p>
                             <textarea readonly>{{ task.description }}</textarea>
                         </div>
-                        <p v-for="p in task.tasks">Задача: {{ p }}</p>
+                        <p class="task_p_non-active" :class="{ 'task_p_active': p.isCompleted }" v-for="p in task.tasks" @click="setStateTask(p)">Задача: {{ p.name }}</p>
                         <p style="color: #9B2D30"> дедлайн {{ task.deadline }}</p>
                         <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
                     </div>
@@ -104,23 +104,40 @@ Vue.component('third_columns', {
     `,
     methods: {
         goToFourth(index) {
+
             let task = this.column.testing.task[index];
-            this.column.testing.task.splice(index, 1);
+            let completedTask = 0
 
-            if (task.deadline != 'не задан') {
-                let currentDate = new Date();
-                let deadlineDate = new Date(task.deadline);
-
-                if (currentDate <= deadlineDate) {
-                    task.inDeadline = true;
-                } else {
-                    task.inDeadline = false;
+            for (let i = 0; i < task.tasks.length; i++) {
+                if (task.tasks[i].isCompleted === true) {
+                    completedTask++;
                 }
-            } else {
-                task.inDeadline = true;
             }
 
-            this.$root.columns.completedTasks.task.push(task);
+            if (completedTask === task.tasks.length) {
+
+                this.column.testing.task.splice(index, 1);
+
+                if (task.deadline != 'не задан') {
+                    let currentDate = new Date();
+                    let deadlineDate = new Date(task.deadline);
+
+                    if (currentDate <= deadlineDate) {
+                        task.inDeadline = true;
+                    } else {
+                        task.inDeadline = false;
+                    }
+                } else {
+                    task.inDeadline = true;
+                }
+
+                this.$root.columns.completedTasks.task.push(task);
+
+            }
+
+            else {
+                alert('у вас есть незаконченые задачи')
+            }
         },
         saveBackRedacted(index) {
             let task = this.column.testing.task[index];
@@ -140,7 +157,7 @@ Vue.component('third_columns', {
 })
 
 Vue.component('second_columns', {
-    props: ['column', 'redactedTasks', 'saveRedactedTasks'],
+    props: ['column', 'redactedTasks', 'saveRedactedTasks', 'setStateTask'],
     template: `
         <div class="columns">
             <h3>{{ column.tasksInProgress.name }}</h3>
@@ -162,7 +179,7 @@ Vue.component('second_columns', {
                         <p>Описание: </p>
                         <textarea readonly>{{ task.description }}</textarea>
                     </div>
-                    <p v-for="p in task.tasks">Задача: {{ p }}</p>
+                    <p class="task_p_non-active" :class="{ 'task_p_active': p.isCompleted }" v-for="p in task.tasks" @click="setStateTask(p)">Задача: {{ p.name }}</p>
                     <p style="color: #9B2D30"> дедлайн {{ task.deadline }}</p>
                     
                     <p class="back_text" v-show="task.backDescription[0] != null">Причины возвращений -</p>
@@ -209,7 +226,7 @@ Vue.component('second_columns', {
 })
 
 Vue.component('first_columns', {
-    props: ['column', 'redactedTasks', 'saveRedactedTasks'],
+    props: ['column', 'redactedTasks', 'saveRedactedTasks', 'setStateTask'],
     template: `
         <div class="columns">
             <h3>{{ column.scheduledTasks.name }}</h3>
@@ -232,7 +249,7 @@ Vue.component('first_columns', {
                         <p>Описание: </p>
                         <textarea readonly>{{ task.description }}</textarea>
                     </div>
-                    <p v-for="p in task.tasks">Задача: {{ p.name }}</p>
+                    <p class="task_p_non-active" :class="{ 'task_p_active': p.isCompleted }" v-for="p in task.tasks" @click="setStateTask(p)">Задача: {{ p.name }}</p>
                     <p style="color: #9B2D30"> дедлайн {{ task.deadline }}</p>
                     <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
                 </div>
@@ -442,5 +459,8 @@ let app = new Vue({
 
             task.cardRedacted = false;
         },
+        setStateTask(task) {
+            task.isCompleted = !task.isCompleted;
+        }
     }
 })
