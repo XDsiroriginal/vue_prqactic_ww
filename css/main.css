@@ -65,6 +65,16 @@
     gap: 10px;
 }
 
+.task_back {
+    width: 90%;
+    padding: 20px;
+    box-shadow: 0 5px 10px 2px rgba(200, 30, 40, 0.2);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .create_new_task_input-block {
     width: 80%;
     padding: 20px;
@@ -97,6 +107,7 @@ textarea {
     padding: 10px;
     margin: 0 auto;
     text-align: center;
+    cursor: pointer;
 }
 
 .none-redacted {
@@ -113,6 +124,7 @@ textarea {
     padding: 10px;
     margin: 0 auto;
     text-align: center;
+    cursor: pointer;
 }
 
 .edit_input {
@@ -131,6 +143,7 @@ textarea {
     align-items: center;
     justify-content: center;
     border: 1px solid darkgreen;
+    cursor: pointer;
 }
 
 .back {
@@ -143,8 +156,40 @@ textarea {
     align-items: center;
     justify-content: center;
     border: 1px solid darkred;
+    cursor: pointer;
 }
 
 .top_button {
     display: flex;
+}
+
+.back_div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.exit {
+    padding: 10px;
+    aspect-ratio: 1/1;
+    border-radius: 10px;
+    box-shadow: 0 5px 10px 2px rgba(34, 60, 80, 0.2);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid darkred;
+}
+
+.back_div_exit {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.back_text {
+    color: var(--color);
+    font-weight: bold;
+    font-size: 20px;
 }

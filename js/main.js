@@ -22,16 +22,17 @@ Vue.component('third_columns', {
     template: `
         <div class="columns">
             <h3>{{ column.testing.name }}</h3>
+
+            <div class="task" v-for="(task, index) in column.testing.task">
             
-            <div v-show="!task.toBackMenu">
-            
-                <div class="task" v-for="(task, index) in column.testing.task">
+                <div v-show="!task.toBackMenu">
+                    
                     <div v-show="!task.cardRedacted" class="none-redacted">
-                    
-                    
+                
+                
                         <div class="top_button">
                         
-                            <div @click="goToBack(index)" class="back">
+                            <div @click="task.toBackMenu = true" class="back">
                                 <p>←</p>
                             </div>
                         
@@ -53,7 +54,7 @@ Vue.component('third_columns', {
                         <p style="color: #9B2D30"> дедлайн {{ task.deadline }}</p>
                         <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
                     </div>
-                    
+                
                     <div v-show="task.cardRedacted" class="redacted-mode">
                     
                         <div @click="saveRedactedTasks(task)" class="saveRedacted_button">
@@ -79,9 +80,22 @@ Vue.component('third_columns', {
                         </div>
                         <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
                     </div>
+                    
+                </div>
+                
+                <div class="back_div" v-show="task.toBackMenu">
+                
+                    <div class="back_div_exit">
+                        <p>Вернуть назад?</p>
+                        <div @click="task.toBackMenu = false" class="exit">x</div>
+                    </div>
+                    <input type="text" placeholder="причина возврата назад" class="edit_input" v-model="task.backDescription">
+                    <div @click="saveBackRedacted(index)" class="saveRedacted_button">Переместить назад</div>
+                
                 </div>
             
             </div>
+            
         </div>
     `,
     methods: {
@@ -89,7 +103,18 @@ Vue.component('third_columns', {
             let task = this.column.testing.task[index];
             this.column.testing.task.splice(index, 1);
             this.$root.columns.completedTasks.task.push(task);
-        }
+        },
+        saveBackRedacted(index) {
+            let task = this.column.testing.task[index];
+
+            if (!task.backDescription || task.backDescription.trim() === '') {
+                task.backDescription = 'не указана';
+            }
+            task.dateCreated = new Date();
+            this.column.testing.task.splice(index, 1);
+            this.$root.columns.tasksInProgress.task.push(task);
+            task.toBackMenu = false;
+        },
     }
 })
 
@@ -98,7 +123,7 @@ Vue.component('second_columns', {
     template: `
         <div class="columns">
             <h3>{{ column.tasksInProgress.name }}</h3>
-            <div class="task" v-for="(task, index) in column.tasksInProgress.task">
+            <div class="task" v-for="(task, index) in column.tasksInProgress.task" :class="{ 'task-back': task.backDescription }">
                 <div v-show="!task.cardRedacted" class="none-redacted">
                 
                     <div class="top_button">
@@ -118,6 +143,9 @@ Vue.component('second_columns', {
                     </div>
                     <p v-for="p in task.tasks">Задача: {{ p }}</p>
                     <p style="color: #9B2D30"> дедлайн {{ task.deadline }}</p>
+                    
+                    <p class="back_text" v-show="task.backDescription != null">Причина возвращения - {{ task.backDescription }}</p>
+                    
                     <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
                 </div>
                 
@@ -277,6 +305,7 @@ Vue.component('create_new_task_component', {
                 editedTasks: [],
                 editedDeadline: '',
                 toBackMenu : false,
+                backDescription: null,
             }
 
             this.$root.columns.scheduledTasks.task.push(task);
@@ -287,7 +316,6 @@ Vue.component('create_new_task_component', {
             this.tasks.task2 = '';
             this.tasks.task3 = '';
             this.deadline = '';
-
         }
     }
 })
