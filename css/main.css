@@ -179,6 +179,7 @@ textarea {
     align-items: center;
     justify-content: center;
     border: 1px solid darkred;
+    cursor: pointer;
 }
 
 .back_div_exit {
