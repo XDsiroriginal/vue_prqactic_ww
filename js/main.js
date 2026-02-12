@@ -3,7 +3,11 @@ Vue.component('fourth_columns', {
     template: `
         <div class="columns">
             <h3>{{ column.completedTasks.name }}</h3>
-            <div class="task" v-for="task in column.completedTasks.task">
+            <div class="task" v-for="(task, index) in column.completedTasks.task">  
+            
+                <p v-if="task.inDeadline" style="color: darkgreen" class="in_dead_line_p">Работа выполнена в срок</p>
+                <p v-else style="color: darkred" class="in_dead_line_p">Работа просрочена</p>
+                 
                 <p>Имя: {{ task.title }}</p>
                 <div>
                     <p>Описание: </p>
@@ -102,6 +106,20 @@ Vue.component('third_columns', {
         goToFourth(index) {
             let task = this.column.testing.task[index];
             this.column.testing.task.splice(index, 1);
+
+            if (task.deadline != 'не задан') {
+                let currentDate = new Date();
+                let deadlineDate = new Date(task.deadline);
+
+                if (currentDate <= deadlineDate) {
+                    task.inDeadline = true;
+                } else {
+                    task.inDeadline = false;
+                }
+            } else {
+                task.inDeadline = true;
+            }
+
             this.$root.columns.completedTasks.task.push(task);
         },
         saveBackRedacted(index) {
@@ -123,7 +141,7 @@ Vue.component('second_columns', {
     template: `
         <div class="columns">
             <h3>{{ column.tasksInProgress.name }}</h3>
-            <div class="task" v-for="(task, index) in column.tasksInProgress.task" :class="{ 'task-back': task.backDescription }">
+            <div class="task" v-for="(task, index) in column.tasksInProgress.task" :class="{ 'task_back': task.backDescription }">
                 <div v-show="!task.cardRedacted" class="none-redacted">
                 
                     <div class="top_button">
@@ -306,6 +324,7 @@ Vue.component('create_new_task_component', {
                 editedDeadline: '',
                 toBackMenu : false,
                 backDescription: null,
+                inDeadline: false,
             }
 
             this.$root.columns.scheduledTasks.task.push(task);
