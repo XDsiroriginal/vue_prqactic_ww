@@ -93,7 +93,7 @@ Vue.component('third_columns', {
                         <p>Вернуть назад?</p>
                         <div @click="task.toBackMenu = false" class="exit">x</div>
                     </div>
-                    <input type="text" placeholder="причина возврата назад" class="edit_input" v-model="task.backDescription">
+                    <input type="text" placeholder="причина возврата назад" class="edit_input" v-model="task.backDescriptionNow">
                     <div @click="saveBackRedacted(index)" class="saveRedacted_button">Переместить назад</div>
                 
                 </div>
@@ -125,8 +125,11 @@ Vue.component('third_columns', {
         saveBackRedacted(index) {
             let task = this.column.testing.task[index];
 
-            if (!task.backDescription || task.backDescription.trim() === '') {
-                task.backDescription = 'не указана';
+            if (!task.backDescriptionNow || task.backDescriptionNow.trim() === '') {
+                task.backDescription.push('не указана');
+            }
+            else {
+                task.backDescription.push(task.backDescriptionNow)
             }
             task.dateCreated = new Date();
             this.column.testing.task.splice(index, 1);
@@ -141,7 +144,7 @@ Vue.component('second_columns', {
     template: `
         <div class="columns">
             <h3>{{ column.tasksInProgress.name }}</h3>
-            <div class="task" v-for="(task, index) in column.tasksInProgress.task" :class="{ 'task_back': task.backDescription }">
+            <div class="task" v-for="(task, index) in column.tasksInProgress.task" :class="{ 'task_back': task.backDescription[0] != null }">
                 <div v-show="!task.cardRedacted" class="none-redacted">
                 
                     <div class="top_button">
@@ -162,7 +165,8 @@ Vue.component('second_columns', {
                     <p v-for="p in task.tasks">Задача: {{ p }}</p>
                     <p style="color: #9B2D30"> дедлайн {{ task.deadline }}</p>
                     
-                    <p class="back_text" v-show="task.backDescription != null">Причина возвращения - {{ task.backDescription }}</p>
+                    <p class="back_text" v-show="task.backDescription[0] != null">Причины возвращений -</p>
+                    <p v-for="backDescription in task.backDescription">{{ backDescription }}</p>
                     
                     <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
                 </div>
@@ -323,7 +327,8 @@ Vue.component('create_new_task_component', {
                 editedTasks: [],
                 editedDeadline: '',
                 toBackMenu : false,
-                backDescription: null,
+                backDescription: [],
+                backDescriptionNow: null,
                 inDeadline: false,
             }
 
