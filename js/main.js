@@ -232,7 +232,7 @@ Vue.component('first_columns', {
                         <p>Описание: </p>
                         <textarea readonly>{{ task.description }}</textarea>
                     </div>
-                    <p v-for="p in task.tasks">Задача: {{ p }}</p>
+                    <p v-for="p in task.tasks">Задача: {{ p.name }}</p>
                     <p style="color: #9B2D30"> дедлайн {{ task.deadline }}</p>
                     <p style="color: grey; font-size: 10px"> последне изменение: {{ task.dateCreated }}</p>
                 </div>
@@ -281,14 +281,13 @@ Vue.component('create_new_task_component', {
             <div class="create_new_task_box">
                 <div class="create_new_task_input-block">
                     <input type="text" placeholder="заголовок" v-model="title" class="input">
-                    <input type="text" placeholder="описание" v-model="description" class="input">
+                    <input type="text" placeholder="описание" v-model="description" class="input">   
                     
-                    <input type="text" placeholder="первая задача" v-model="tasks.task1" class="input">    
-                    <input type="text" placeholder="вторая задача" v-model="tasks.task2" class="input">
-                    <input type="text" placeholder="третья задача" v-model="tasks.task3" class="input">  
+                    <input v-for="(task, index) in tasksArray" :key="index" type="text" :placeholder="'Задача ' + (index + 1)" v-model="tasksArray[index].name" class="input">
+                    
+                    <button class="add_task" @click="addTask">Добавить задачу</button>
                     
                     <input type="datetime-local" placeholder="дедлайн" v-model="deadline" class="input">                  
-                    
                 </div>
                 
                 <div class="create_new_task_button" @click="addNewTask">
@@ -301,44 +300,64 @@ Vue.component('create_new_task_component', {
         return {
             title: '',
             description: '',
-            tasks: {
-                task1: '',
-                task2: '',
-                task3: '',
-            },
+            tasksArray: [{
+                name: null,
+                isCompleted: false,
+            }, {
+                name: null,
+                isCompleted: false,
+            }, {
+                name: null,
+                isCompleted: false,
+            }],
             deadline: ''
         }
     },
     methods: {
+        addTask() {
+            this.tasksArray.push({
+                name: null,
+                isCompleted: false
+            });
+        },
         addNewTask() {
             let task = {
                 dateCreated: new Date(),
                 title: this.title || 'Без имени',
                 description: this.description || 'Без описания',
-                tasks: [
-                    this.tasks.task1 || 'Без имени',
-                    this.tasks.task2 || 'Без имени',
-                    this.tasks.task3 || 'Без имени'
-                ].filter(task => task !== ''),
+                tasks: this.tasksArray,
                 deadline: this.deadline || 'не задан',
                 cardRedacted: false,
                 editedTitle: '',
                 editedDescription: '',
                 editedTasks: [],
                 editedDeadline: '',
-                toBackMenu : false,
+                toBackMenu: false,
                 backDescription: [],
                 backDescriptionNow: null,
                 inDeadline: false,
+            }
+
+            for (i = 0; i < task.tasks.length; i++) {
+                if (task.tasks[i].name === null) {
+                    task.tasks[i].name = 'не задана'
+                }
             }
 
             this.$root.columns.scheduledTasks.task.push(task);
 
             this.title = '';
             this.description = '';
-            this.tasks.task1 = '';
-            this.tasks.task2 = '';
-            this.tasks.task3 = '';
+            this.tasksArray = [{
+                name: null,
+                isCompleted: false,
+            }, {
+                name: null,
+                isCompleted: false,
+            }, {
+                name: null,
+                isCompleted: false,
+            }];
             this.deadline = '';
         }
     }
@@ -365,12 +384,23 @@ let app = new Vue({
                 task: [],
             }
         },
+        countTask: 3,
     },
     methods: {
         redactedTasks(task) {
             task.editedTitle = task.title;
             task.editedDescription = task.description;
-            task.editedTasks = [...task.tasks];
+
+            if (task.tasks && task.tasks.length > 0) {
+                if (typeof task.tasks[0] === 'object') {
+                    task.editedTasks = task.tasks.map(t => t.name);
+                } else {
+                    task.editedTasks = [...task.tasks];
+                }
+            } else {
+                task.editedTasks = [];
+            }
+
             task.editedDeadline = task.deadline !== 'не задан' ? task.deadline : '';
             task.cardRedacted = true;
         },
@@ -381,8 +411,20 @@ let app = new Vue({
 
             if (task.editedTasks) {
                 task.editedTasks.forEach((editedTask, i) => {
-                    if (editedTask && editedTask.trim() !== '') {
-                        task.tasks[i] = editedTask;
+                    if (editedTask) {
+                        if (typeof editedTask === 'string' && editedTask.trim() !== '') {
+                            if (typeof task.tasks[i] === 'object') {
+                                task.tasks[i].name = editedTask;
+                            } else {
+                                task.tasks[i] = editedTask;
+                            }
+                        } else if (typeof editedTask === 'object' && editedTask.name) {
+                            if (typeof task.tasks[i] === 'object') {
+                                task.tasks[i].name = editedTask.name;
+                            } else {
+                                task.tasks[i] = editedTask.name;
+                            }
+                        }
                     }
                 });
             }

@@ -208,3 +208,17 @@ textarea {
     flex-direction: column;
     gap: 10px;
 }
+
+.add_task {
+    width: 280px;
+    height: 35px;
+    background-color: var(--color);
+    border-radius: 20px;
+    color: white;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+}
